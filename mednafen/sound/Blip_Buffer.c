@@ -93,6 +93,8 @@ blargg_err_t Blip_Buffer_set_sample_rate(Blip_Buffer* bbuf, long new_rate,
    // update things based on the sample rate
    bbuf->sample_rate = new_rate;
    bbuf->length = new_size * 1000 / new_rate - 1;
+   if (bbuf->length <= 0)
+      return "Invalid buffer size";
    if (msec)
       assert(bbuf->length == msec);   // ensure length is same as that passed in
    if (bbuf->clock_rate)
@@ -146,7 +148,7 @@ long Blip_Buffer_count_samples(Blip_Buffer* bbuf,  blip_time_t t)
 {
    unsigned long last_sample  = Blip_Buffer_resampled_time(bbuf, t) >> BLIP_BUFFER_ACCURACY;
    unsigned long first_sample = bbuf->offset >> BLIP_BUFFER_ACCURACY;
-   return (long)(last_sample - first_sample);
+   return (long)(last_sample - first_sample + 1);
 }
 
 void Blip_Buffer_remove_samples(Blip_Buffer* bbuf,  long count)
